@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { MovieResponse, PageMovieResponse, CreateMovieRequest, UpdateMovieRequest } from './types';
+import type { MovieResponse, PageMovieResponse, CreateMovieRequest, UpdateMovieRequest, PageInteger } from './types';
 
 export const moviesApi = {
   getAll: (params?: {
@@ -23,4 +23,7 @@ export const moviesApi = {
 
   delete: (id: number) =>
     apiClient.delete(`/v1/movies/${id}`),
+
+  getYears: (params?: { page?: number; size?: number }) =>
+    apiClient.get<PageInteger>('/v1/movies/years', { params }).then((r) => r.data),
 };

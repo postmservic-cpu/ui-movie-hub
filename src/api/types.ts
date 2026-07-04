@@ -106,3 +106,12 @@ export interface PageRatingResponse {
   size: number;
   number: number;
 }
+
+// === Page Integer (years) ===
+export interface PageInteger {
+  content: number[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}

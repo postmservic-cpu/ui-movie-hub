@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMovies } from '@/hooks/useMovies';
+import { useMovies, useMovieYears } from '@/hooks/useMovies';
 import { useCategories } from '@/hooks/useCategories';
 import MovieCard from '@/components/MovieCard';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,8 @@ export default function HomePage() {
   });
 
   const { data: categories = [] } = useCategories();
-
-  const years = Array.from({ length: 20 }, (_, i) => 2026 - i);
+  const { data: yearsData } = useMovieYears();
+  const years = yearsData?.content ?? [];
 
   const yearItems = [
     { value: 'all', label: 'All years' },

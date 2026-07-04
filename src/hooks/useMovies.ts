@@ -51,3 +51,10 @@ export function useDeleteMovie() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['movies'] }),
   });
 }
+
+export function useMovieYears() {
+  return useQuery({
+    queryKey: ['movieYears'],
+    queryFn: () => moviesApi.getYears({ page: 0, size: 200 }),
+  });
+}
