@@ -54,7 +54,7 @@ The UI needs an OIDC client to authenticate users.
 1. Go to **Clients** → **Create client**
 2. Enter:
    - **Client type:** `OpenID Connect`
-   - **Client ID:** `movie-hub-client`
+   - **Client ID:** `movie-hub-postman`
 3. Click **Next**
 4. Configure:
    - **Client authentication:** Off (public client - no secret needed for browser apps)
