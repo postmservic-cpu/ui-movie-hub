@@ -1,9 +1,9 @@
 import apiClient from './client';
-import type { CategoryResponse, CreateCategoryRequest, UpdateCategoryRequest } from './types';
+import type { PageCategoryResponse, CategoryResponse, CreateCategoryRequest, UpdateCategoryRequest } from './types';
 
 export const categoriesApi = {
-  getAll: () =>
-    apiClient.get<CategoryResponse[]>('/v1/categories').then((r) => r.data),
+  getAll: (params?: { page?: number; size?: number }) =>
+    apiClient.get<PageCategoryResponse>('/v1/categories', { params }).then((r) => r.data),
 
   getById: (id: number) =>
     apiClient.get<CategoryResponse>(`/v1/categories/${id}`).then((r) => r.data),

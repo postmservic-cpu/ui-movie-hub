@@ -5,7 +5,7 @@ import type { CreateCategoryRequest, UpdateCategoryRequest } from '@/api/types';
 export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
-    queryFn: () => categoriesApi.getAll(),
+    queryFn: () => categoriesApi.getAll({ size: 200 }),
   });
 }
 

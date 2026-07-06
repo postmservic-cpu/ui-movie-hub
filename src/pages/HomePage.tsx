@@ -22,7 +22,8 @@ export default function HomePage() {
     size,
   });
 
-  const { data: categories = [] } = useCategories();
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.content ?? [];
   const { data: yearsData } = useMovieYears();
   const years = yearsData?.content ?? [];
 

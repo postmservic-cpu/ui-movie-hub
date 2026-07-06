@@ -9,7 +9,8 @@ import { useState } from 'react';
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
 
 export default function AdminCategoriesPage() {
-  const { data: categories = [], isLoading } = useCategories();
+  const { data: categoriesData, isLoading } = useCategories();
+  const categories = categoriesData?.content ?? [];
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();

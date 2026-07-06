@@ -59,6 +59,14 @@ export interface CategoryResponse {
   name: string;
 }
 
+export interface PageCategoryResponse {
+  content: CategoryResponse[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
 // === Comment ===
 export const CreateCommentSchema = z.object({
   text: z.string().min(1, 'Comment cannot be empty'),

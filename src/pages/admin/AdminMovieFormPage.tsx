@@ -18,7 +18,8 @@ export default function AdminMovieFormPage() {
   const navigate = useNavigate();
 
   const { data: movie } = useMovie(Number(id));
-  const { data: categories = [] } = useCategories();
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.content ?? [];
   const createMovie = useCreateMovie();
   const updateMovie = useUpdateMovie();
 
