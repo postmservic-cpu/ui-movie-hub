@@ -1,10 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Film, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
+import { Film, LogIn, LogOut, LayoutDashboard, UserPlus } from 'lucide-react';
 
 export default function Layout() {
-  const { isAuthenticated, isAdmin, login, logout, user } = useAuth();
+  const { isAuthenticated, isAdmin, login, logout, register, user } = useAuth();
   const location = useLocation();
 
   return (
@@ -42,9 +42,14 @@ export default function Layout() {
                 </Button>
               </div>
             ) : (
-              <Button size="sm" onClick={login}>
-                <LogIn className="h-4 w-4 mr-1" /> Login
-              </Button>
+              <>
+                <Button size="sm" onClick={login}>
+                  <LogIn className="h-4 w-4 mr-1" /> Login
+                </Button>
+                <Button variant="outline" size="sm" onClick={register}>
+                  <UserPlus className="h-4 w-4 mr-1" /> Register
+                </Button>
+              </>
             )}
           </nav>
         </div>

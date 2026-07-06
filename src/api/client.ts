@@ -11,8 +11,11 @@ apiClient.interceptors.request.use((config) => {
   if (oidcStorage) {
     try {
       const user = JSON.parse(oidcStorage);
-      if (user?.id_token) {
-        config.headers.Authorization = `Bearer ${user.id_token}`;
+      // Use access_token for API calls (not id_token)
+      // access_token is used to access protected resources (backend)
+      // id_token is used to identify the user (client/UI)
+      if (user?.access_token) {
+        config.headers.Authorization = `Bearer ${user.access_token}`;
       }
     } catch {
       // ignore parse errors
