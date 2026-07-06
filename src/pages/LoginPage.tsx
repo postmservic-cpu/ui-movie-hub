@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login, register } = useAuth();
+  const { login } = useAuth();
 
   return (
     <div className="container mx-auto px-4 py-16 flex flex-col items-center">
@@ -12,12 +12,7 @@ export default function LoginPage() {
       <Button size="lg" onClick={login}>
         <LogIn className="h-5 w-5 mr-2" /> Sign in with Keycloak
       </Button>
-      <p className="mt-4 text-sm text-muted-foreground">
-        Don't have an account?{' '}
-        <button onClick={register} className="text-primary hover:underline">
-          Register here
-        </button>
-      </p>
+      <p className="mt-4 text-sm text-muted-foreground">Registration is available on the Keycloak screen.</p>
     </div>
   );
 }

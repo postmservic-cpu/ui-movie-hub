@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { toast } from 'sonner';
+import { User } from 'oidc-client-ts';
+import { oidcStorageKey } from '@/auth/keycloak';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -7,18 +9,15 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const oidcStorage = sessionStorage.getItem('oidc.user');
+  const oidcStorage = localStorage.getItem(oidcStorageKey);
   if (oidcStorage) {
     try {
-      const user = JSON.parse(oidcStorage);
-      // Use access_token for API calls (not id_token)
-      // access_token is used to access protected resources (backend)
-      // id_token is used to identify the user (client/UI)
+      const user = User.fromStorageString(oidcStorage);
       if (user?.access_token) {
         config.headers.Authorization = `Bearer ${user.access_token}`;
       }
     } catch {
-      // ignore parse errors
+      // ignore malformed OIDC payloads
     }
   }
   return config;

@@ -1,10 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Film, LogIn, LogOut, LayoutDashboard, UserPlus } from 'lucide-react';
+import { Film, LogIn, LogOut, LayoutDashboard } from 'lucide-react';
 
 export default function Layout() {
-  const { isAuthenticated, isAdmin, login, logout, register, user } = useAuth();
+  const { displayName, isAuthenticated, isAdmin, login, logout } = useAuth();
   const location = useLocation();
 
   return (
@@ -35,7 +35,7 @@ export default function Layout() {
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {(user?.profile as Record<string, string>)?.preferred_username}
+                  {displayName}
                 </span>
                 <Button variant="outline" size="sm" onClick={logout}>
                   <LogOut className="h-4 w-4 mr-1" /> Logout
@@ -44,10 +44,7 @@ export default function Layout() {
             ) : (
               <>
                 <Button size="sm" onClick={login}>
-                  <LogIn className="h-4 w-4 mr-1" /> Login
-                </Button>
-                <Button variant="outline" size="sm" onClick={register}>
-                  <UserPlus className="h-4 w-4 mr-1" /> Register
+                  <LogIn className="h-4 w-4 mr-1" /> Sign in
                 </Button>
               </>
             )}

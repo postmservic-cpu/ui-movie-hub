@@ -15,7 +15,7 @@ import { Trash2 } from 'lucide-react';
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
   const movieId = Number(id);
-  const { isAuthenticated, isAdmin, user } = useAuth();
+  const { isAuthenticated, isAdmin, userId } = useAuth();
 
   const { data: movie, isLoading: movieLoading } = useMovie(movieId);
   const { data: commentsData } = useComments(movieId);
@@ -110,7 +110,7 @@ export default function MovieDetailPage() {
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      {(isAdmin || comment.userId === (user?.profile as Record<string, string>)?.sub) && (
+                      {(isAdmin || comment.userId === userId) && (
                         <Button
                           variant="ghost"
                           size="sm"

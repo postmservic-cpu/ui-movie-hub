@@ -1,12 +1,11 @@
 import { AuthProvider } from 'react-oidc-context';
-
-const keycloakBaseUrl = import.meta.env.VITE_KEYCLOAK_URL.replace(/\/$/, '');
-const keycloakRealm = import.meta.env.VITE_KEYCLOAK_REALM;
-const keycloakAuthority = `${keycloakBaseUrl}/realms/${keycloakRealm}`;
+import { WebStorageStateStore } from 'oidc-client-ts';
+import { keycloakAuthority, keycloakClientId } from '@/auth/keycloak';
 
 const keycloakConfig = {
   authority: keycloakAuthority,
-  client_id: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
+  client_id: keycloakClientId,
+  userStore: new WebStorageStateStore({ store: window.localStorage }),
   redirect_uri: window.location.origin,
   post_logout_redirect_uri: window.location.origin,
   onSigninCallback: () => {
