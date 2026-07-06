@@ -70,7 +70,7 @@ paths:
           in: query
           schema:
             type: integer
-            default: 20
+            default: 100
       responses:
         '200':
           description: Page of movies
@@ -109,6 +109,35 @@ paths:
                 $ref: '#/components/schemas/PageInteger'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags: [Movies]
+      summary: Create a new movie
+      description: Admin-only. Creates a new movie.
+      operationId: createMovie
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMovieRequest'
+      responses:
+        '201':
+          description: Movie created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -201,7 +230,7 @@ paths:
           in: query
           schema:
             type: integer
-            default: 20
+            default: 100
       responses:
         '200':
           description: Page of comments
@@ -294,7 +323,7 @@ paths:
           in: query
           schema:
             type: integer
-            default: 20
+            default: 100
       responses:
         '200':
           description: Page of ratings
@@ -344,17 +373,26 @@ paths:
     get:
       tags: [Categories]
       summary: Get all categories
-      description: Returns a list of all categories.
+      description: Returns a paginated list of categories.
       operationId: getCategories
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 100
       responses:
         '200':
-          description: List of categories
+          description: Page of categories
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CategoryResponse'
+                $ref: '#/components/schemas/PageCategoryResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -390,24 +428,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /v1/categories/{id}:
-    get:
-      tags: [Categories]
-      summary: Get category by ID
-      operationId: getCategoryById
-      parameters:
-        - $ref: '#/components/parameters/CategoryId'
-      responses:
-        '200':
-          description: Category found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CategoryResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
     put:
       tags: [Categories]
       summary: Update a category
@@ -644,6 +664,24 @@ components:
           type: array
           items:
             type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+
+    PageCategoryResponse:
+      type: object
+      description: Page envelope for CategoryResponse results, matching Spring Data Page<CategoryResponse>.
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryResponse'
         totalElements:
           type: integer
           format: int64

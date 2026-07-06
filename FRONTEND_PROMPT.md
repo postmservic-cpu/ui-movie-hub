@@ -6,7 +6,7 @@ Build a complete React frontend for the Movie Hub REST API. The app allows users
 
 **Backend API**: `https://rest-api-movie-hub-latest.onrender.com` (production) / `http://localhost:8080` (local)
 
-**API Spec**: `src/main/resources/openapi/api/api-v1-movie-hub.yaml` — source of truth for TypeScript types, Zod schemas, and endpoint signatures
+**API Spec**: `open-api-spec/api-v1-movie-hub.yaml` — source of truth for TypeScript types, Zod schemas, and endpoint signatures
 
 **Swagger UI**: `https://rest-api-movie-hub-latest.onrender.com/swagger-ui/index.html` — interactive testing of the deployed API
 
