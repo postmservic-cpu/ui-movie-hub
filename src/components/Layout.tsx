@@ -26,7 +26,7 @@ export default function Layout() {
           </Link>
           <nav className="flex items-center gap-4">
             {isAuthenticated && isAdmin && (
-              <Link to="/admin/movies">
+              <Link to="/admin">
                 <Button variant="ghost" size="sm">
                   <LayoutDashboard className="h-4 w-4 mr-1" /> Admin
                 </Button>

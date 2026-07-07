@@ -34,8 +34,8 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">Manage Categories</h1>
+    <div className="max-w-2xl">
+      <h2 className="text-2xl font-bold mb-6">Manage Categories</h2>
 
       <form onSubmit={handleSubmit(onCreate)} className="flex gap-2 mb-6">
         <Input {...register('name')} placeholder="New category name" className="flex-1" />
