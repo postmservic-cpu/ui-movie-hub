@@ -272,7 +272,7 @@ The backend uses these claims to:
 
 1. Get a token from Keycloak:
    - **Grant Type:** Password
-   - **Client ID:** `movie-hub-client`
+   - **Client ID:** the same client id configured in your `.env` file
    - **Username:** `admin`
    - **Password:** `admin`
    - **Token URL:** `http://localhost:8180/realms/movie-hub/protocol/openid-connect/token`
@@ -300,6 +300,7 @@ The backend uses these claims to:
 | "User not found" | Check if user was created in Keycloak and has a password set |
 | UI still shows `Sign in` after callback | Check that `VITE_KEYCLOAK_URL`, `VITE_KEYCLOAK_REALM`, and `VITE_KEYCLOAK_CLIENT_ID` match the active Keycloak client |
 | UI still shows old auth state | Clear browser storage and sign in again |
+| Direct URL like `/login` returns 404 on Render | Configure a static-site rewrite rule to serve `/index.html` for client-side routes. Render supports rewrites for React Router-style SPAs. |
 
 ## Useful Links
 

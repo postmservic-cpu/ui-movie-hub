@@ -27,7 +27,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      window.location.href = '/login';
+      const hasAuthHeader = Boolean(error.config?.headers?.Authorization);
+      if (hasAuthHeader) {
+        localStorage.removeItem(oidcStorageKey);
+        window.location.replace('/');
+      }
     } else {
       const message = error.response?.data?.detail || 'An unexpected error occurred';
       toast.error(message);
