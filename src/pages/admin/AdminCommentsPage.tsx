@@ -1,18 +1,22 @@
+import { useState } from 'react';
 import { useMovies } from '@/hooks/useMovies';
 import { useComments, useDeleteComment } from '@/hooks/useComments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
+import Pagination from '@/components/Pagination';
+
+const PAGE_SIZE = 10;
 
 export default function AdminCommentsPage() {
   const [selectedMovieId, setSelectedMovieId] = useState<string>('');
+  const [page, setPage] = useState(0);
   const { data: moviesData } = useMovies({ page: 0, size: 200 });
   const movies = moviesData?.content ?? [];
 
   const movieId = selectedMovieId && selectedMovieId !== 'all' ? Number(selectedMovieId) : 0;
-  const { data: commentsData, isLoading } = useComments(movieId);
+  const { data: commentsData, isLoading } = useComments(movieId, { page, size: PAGE_SIZE });
   const comments = commentsData?.content ?? [];
   const deleteComment = useDeleteComment(movieId);
 
@@ -24,7 +28,7 @@ export default function AdminCommentsPage() {
   return (
     <div>
       <div className="flex flex-wrap gap-4 mb-6">
-        <Select value={selectedMovieId} onValueChange={(v) => setSelectedMovieId(v === null ? '' : v)} items={movieItems}>
+        <Select value={selectedMovieId} onValueChange={(v) => { setSelectedMovieId(v === null ? '' : v); setPage(0); }} items={movieItems}>
           <SelectTrigger className="w-[250px]">
             <SelectValue placeholder="Select a movie" />
           </SelectTrigger>
@@ -81,6 +85,10 @@ export default function AdminCommentsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {selectedMovieId && selectedMovieId !== 'all' && (
+        <Pagination page={page} totalPages={commentsData?.totalPages ?? 0} onPageChange={setPage} />
+      )}
     </div>
   );
 }

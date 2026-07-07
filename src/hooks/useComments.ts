@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
 import type { CreateCommentRequest } from '@/api/types';
 
-export function useComments(movieId: number) {
+export function useComments(movieId: number, params?: { page?: number; size?: number }) {
   return useQuery({
-    queryKey: ['comments', movieId],
-    queryFn: () => commentsApi.getByMovieId(movieId),
+    queryKey: ['comments', movieId, params],
+    queryFn: () => commentsApi.getByMovieId(movieId, params?.page, params?.size),
     enabled: !!movieId,
   });
 }

@@ -8,22 +8,26 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import Pagination from '@/components/Pagination';
+
+const PAGE_SIZE = 10;
 
 export default function AdminMoviesPage() {
   const [search, setSearch] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [page, setPage] = useState(0);
 
   const { data, isLoading } = useMovies({
     title: search || undefined,
     year: selectedYear && selectedYear !== 'all' ? Number(selectedYear) : undefined,
     categoryId: selectedCategory && selectedCategory !== 'all' ? Number(selectedCategory) : undefined,
-    page: 0,
-    size: 200,
+    page,
+    size: PAGE_SIZE,
   });
   const deleteMovie = useDeleteMovie();
 
-  const { data: categoriesData } = useCategories();
+  const { data: categoriesData } = useCategories({ page: 0, size: 200 });
   const categories = categoriesData?.content ?? [];
   const { data: yearsData } = useMovieYears();
   const years = yearsData?.content ?? [];
@@ -53,11 +57,11 @@ export default function AdminMoviesPage() {
           <Input
             placeholder="Search by title..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="pl-10"
           />
         </div>
-        <Select value={selectedYear} onValueChange={(v) => setSelectedYear(v === 'all' || v === null ? '' : v)} items={yearItems}>
+        <Select value={selectedYear} onValueChange={(v) => { setSelectedYear(v === 'all' || v === null ? '' : v); setPage(0); }} items={yearItems}>
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="All years" />
           </SelectTrigger>
@@ -68,7 +72,7 @@ export default function AdminMoviesPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v === 'all' || v === null ? '' : v)} items={categoryItems}>
+        <Select value={selectedCategory} onValueChange={(v) => { setSelectedCategory(v === 'all' || v === null ? '' : v); setPage(0); }} items={categoryItems}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
@@ -122,6 +126,8 @@ export default function AdminMoviesPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination page={page} totalPages={data?.totalPages ?? 0} onPageChange={setPage} />
     </div>
   );
 }
