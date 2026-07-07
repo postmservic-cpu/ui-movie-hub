@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMovie } from '@/hooks/useMovies';
 import { useComments, useCreateComment, useDeleteComment } from '@/hooks/useComments';
@@ -10,12 +11,13 @@ import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateCommentSchema, type CreateCommentRequest } from '@/api/types';
-import { Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
   const movieId = Number(id);
   const { isAuthenticated, isAdmin, userId } = useAuth();
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
 
   const { data: movie, isLoading: movieLoading } = useMovie(movieId);
   const { data: commentsData } = useComments(movieId);
@@ -30,10 +32,13 @@ export default function MovieDetailPage() {
   });
 
   const onSubmitComment = (data: CreateCommentRequest) => {
+    if (createComment.isPending) return;
     createComment.mutate(data, { onSuccess: () => reset() });
   };
 
   const handleRate = (score: number) => {
+    if (createRating.isPending) return;
+    setSelectedRating(score);
     createRating.mutate({ score });
   };
 
@@ -66,16 +71,33 @@ export default function MovieDetailPage() {
               <CardTitle className="text-lg">Rate this movie</CardTitle>
             </CardHeader>
             <CardContent>
+              {selectedRating !== null && (
+                <p className="mb-3 text-sm text-muted-foreground">
+                  Selected rating: <span className="font-medium text-foreground">{selectedRating}/10</span>
+                </p>
+              )}
+              {createRating.isPending && (
+                <p className="mb-3 text-sm text-muted-foreground flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving your rating...
+                </p>
+              )}
               <div className="flex gap-1">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((score) => (
                   <Button
                     key={score}
-                    variant="outline"
+                    variant={selectedRating === score ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => handleRate(score)}
-                    disabled={!isAuthenticated}
+                    disabled={!isAuthenticated || createRating.isPending}
+                    aria-pressed={selectedRating === score}
+                    className={selectedRating === score ? 'ring-2 ring-primary/30 shadow-sm' : ''}
                   >
-                    {score}
+                    {createRating.isPending && selectedRating === score ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      score
+                    )}
                   </Button>
                 ))}
               </div>
@@ -94,9 +116,21 @@ export default function MovieDetailPage() {
             <CardContent>
               {isAuthenticated && (
                 <form onSubmit={handleSubmit(onSubmitComment)} className="mb-6">
-                  <Textarea {...register('text')} placeholder="Write a comment..." className="mb-2" />
+                  <Textarea
+                    {...register('text')}
+                    placeholder="Write a comment..."
+                    className="mb-2"
+                    disabled={createComment.isPending}
+                  />
                   <Button type="submit" disabled={createComment.isPending}>
-                    {createComment.isPending ? 'Posting...' : 'Post Comment'}
+                    {createComment.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      'Post Comment'
+                    )}
                   </Button>
                 </form>
               )}
