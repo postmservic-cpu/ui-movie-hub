@@ -27,7 +27,7 @@ export default function AdminMoviesPage() {
   });
   const deleteMovie = useDeleteMovie();
 
-  const { data: categoriesData } = useCategories({ page: 0, size: 200 });
+  const { data: categoriesData } = useCategories();
   const categories = categoriesData?.content ?? [];
   const { data: yearsData } = useMovieYears();
   const years = yearsData?.content ?? [];

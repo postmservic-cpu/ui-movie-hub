@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoriesApi } from '@/api/categories';
 import type { CreateCategoryRequest, UpdateCategoryRequest } from '@/api/types';
 
-export function useCategories(params?: { page?: number; size?: number }) {
+export function useCategories() {
   return useQuery({
-    queryKey: ['categories', params],
-    queryFn: () => categoriesApi.getAll(params),
+    queryKey: ['categories'],
+    queryFn: () => categoriesApi.getAll(),
   });
 }
 
