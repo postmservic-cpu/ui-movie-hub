@@ -9,18 +9,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
 import Pagination from '@/components/Pagination';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default function AdminCategoriesPage() {
-  const [page, setPage] = useState(0);
-  const { data: categoriesData, isLoading } = useCategories({ page, size: PAGE_SIZE });
-  const categories = categoriesData?.content ?? [];
+  const { data: categoriesData, isLoading } = useCategories();
+  const allCategories = categoriesData?.content ?? [];
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
 
+  const [page, setPage] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
+
+  const totalPages = Math.max(1, Math.ceil(allCategories.length / PAGE_SIZE));
+  const categories = allCategories.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const { register, handleSubmit, reset } = useForm<CreateCategoryRequest>({
     resolver: zodResolver(CreateCategorySchema),
@@ -113,7 +116,7 @@ export default function AdminCategoriesPage() {
         </Table>
       </div>
 
-      <Pagination page={page} totalPages={categoriesData?.totalPages ?? 0} onPageChange={setPage} />
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

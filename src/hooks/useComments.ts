@@ -2,6 +2,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
 import type { CreateCommentRequest } from '@/api/types';
 
+export function useAllComments(params?: { username?: string; text?: string; page?: number; size?: number }) {
+  return useQuery({
+    queryKey: ['allComments', params],
+    queryFn: () => commentsApi.getAll(params),
+  });
+}
+
 export function useComments(movieId: number, params?: { page?: number; size?: number }) {
   return useQuery({
     queryKey: ['comments', movieId, params],

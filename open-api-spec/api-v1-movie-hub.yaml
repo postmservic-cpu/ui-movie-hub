@@ -369,6 +369,49 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /v1/comments:
+    get:
+      tags: [Comments]
+      summary: Get all comments (admin)
+      description: Admin-only. Returns paginated comments ordered by newest first, with optional user and text filters.
+      operationId: getAllComments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: query
+          description: Filter by username (contains, case-insensitive)
+          schema:
+            type: string
+        - name: text
+          in: query
+          description: Fulltext search in comment text (contains, case-insensitive)
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Page of comments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCommentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /v1/categories:
     get:
       tags: [Categories]
