@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { useAllComments } from '@/hooks/useComments';
+import { useAllComments, useAdminDeleteComment } from '@/hooks/useComments';
+import { useMovies } from '@/hooks/useMovies';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 import Pagination from '@/components/Pagination';
 
 const PAGE_SIZE = 10;
@@ -19,6 +21,11 @@ export default function AdminCommentsPage() {
     size: PAGE_SIZE,
   });
   const comments = data?.content ?? [];
+  const deleteComment = useAdminDeleteComment();
+
+  const { data: moviesData } = useMovies({ page: 0, size: 100 });
+  const movies = moviesData?.content ?? [];
+  const movieMap = new Map(movies.map((m) => [m.id, m.title]));
 
   return (
     <div>
@@ -48,25 +55,39 @@ export default function AdminCommentsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Movie ID</TableHead>
+              <TableHead>Movie</TableHead>
               <TableHead>User</TableHead>
               <TableHead>Comment</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={5}>Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6}>Loading...</TableCell></TableRow>
             ) : comments.length === 0 ? (
-              <TableRow><TableCell colSpan={5}>No comments found</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6}>No comments found</TableCell></TableRow>
             ) : (
               comments.map((comment) => (
                 <TableRow key={comment.id}>
                   <TableCell>{comment.id}</TableCell>
-                  <TableCell>{comment.movieId}</TableCell>
+                  <TableCell>{movieMap.get(comment.movieId) ?? `#${comment.movieId}`}</TableCell>
                   <TableCell>{comment.username}</TableCell>
                   <TableCell className="max-w-[300px] truncate">{comment.text}</TableCell>
                   <TableCell>{new Date(comment.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm('Delete this comment?')) {
+                          deleteComment.mutate({ movieId: comment.movieId, commentId: comment.id });
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}

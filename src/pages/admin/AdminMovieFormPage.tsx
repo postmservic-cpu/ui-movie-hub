@@ -43,10 +43,10 @@ export default function AdminMovieFormPage() {
     if (isEdit) {
       updateMovie.mutate(
         { id: Number(id), data },
-        { onSuccess: () => navigate('/admin/movies') }
+        { onSuccess: () => navigate('/admin') }
       );
     } else {
-      createMovie.mutate(data, { onSuccess: () => navigate('/admin/movies') });
+      createMovie.mutate(data, { onSuccess: () => navigate('/admin') });
     }
   };
 
@@ -80,6 +80,7 @@ export default function AdminMovieFormPage() {
                 <Select
                   value={watch('categoryId')?.toString()}
                   onValueChange={(v) => setValue('categoryId', Number(v))}
+                  items={categories.map((cat) => ({ value: String(cat.id), label: cat.name }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
@@ -93,7 +94,7 @@ export default function AdminMovieFormPage() {
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate('/admin/movies')}>
+              <Button type="button" variant="outline" onClick={() => navigate('/admin')}>
                 Cancel
               </Button>
               <Button type="submit" disabled={createMovie.isPending || updateMovie.isPending}>

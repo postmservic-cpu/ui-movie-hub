@@ -32,3 +32,12 @@ export function useDeleteComment(movieId: number) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments', movieId] }),
   });
 }
+
+export function useAdminDeleteComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ movieId, commentId }: { movieId: number; commentId: number }) =>
+      commentsApi.delete(movieId, commentId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['allComments'] }),
+  });
+}
