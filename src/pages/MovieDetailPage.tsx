@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMovie } from '@/hooks/useMovies';
 import { useComments, useCreateComment, useDeleteComment } from '@/hooks/useComments';
 import { useCreateRating } from '@/hooks/useRatings';
@@ -11,10 +11,11 @@ import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreateCommentSchema, type CreateCommentRequest } from '@/api/types';
-import { Loader2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Trash2 } from 'lucide-react';
 
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const movieId = Number(id);
   const { isAuthenticated, isAdmin, userId } = useAuth();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
@@ -42,11 +43,26 @@ export default function MovieDetailPage() {
     createRating.mutate({ score });
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate('/');
+  };
+
   if (movieLoading) return <div className="container mx-auto p-8">Loading...</div>;
   if (!movie) return <div className="container mx-auto p-8">Movie not found</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Button variant="ghost" size="sm" onClick={handleBack} className="pl-0">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to movies
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
           <img
