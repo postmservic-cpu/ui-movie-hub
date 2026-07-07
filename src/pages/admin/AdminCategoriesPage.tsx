@@ -7,9 +7,13 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Pencil, Trash2, Check, X } from 'lucide-react';
+import Pagination from '@/components/Pagination';
+
+const PAGE_SIZE = 20;
 
 export default function AdminCategoriesPage() {
-  const { data: categoriesData, isLoading } = useCategories();
+  const [page, setPage] = useState(0);
+  const { data: categoriesData, isLoading } = useCategories({ page, size: PAGE_SIZE });
   const categories = categoriesData?.content ?? [];
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
@@ -108,6 +112,8 @@ export default function AdminCategoriesPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination page={page} totalPages={categoriesData?.totalPages ?? 0} onPageChange={setPage} />
     </div>
   );
 }
