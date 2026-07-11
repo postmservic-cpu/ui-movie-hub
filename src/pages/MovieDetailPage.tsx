@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMovie } from '@/hooks/useMovies';
-import { useComments, useCreateComment, useDeleteComment } from '@/hooks/useComments';
+import { useComments, useCreateComment, useUpdateComment, useDeleteComment } from '@/hooks/useComments';
 import { useCreateRating } from '@/hooks/useRatings';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateCommentSchema, type CreateCommentRequest } from '@/api/types';
-import { ArrowLeft, Loader2, Trash2 } from 'lucide-react';
+import { CreateCommentSchema, UpdateCommentSchema, type CreateCommentRequest, type UpdateCommentRequest } from '@/api/types';
+import { ArrowLeft, Loader2, Trash2, Pencil, X, Check } from 'lucide-react';
 
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,12 +19,14 @@ export default function MovieDetailPage() {
   const movieId = Number(id);
   const { isAuthenticated, isAdmin, userId } = useAuth();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
 
   const { data: movie, isLoading: movieLoading } = useMovie(movieId);
   const { data: commentsData } = useComments(movieId);
   const comments = commentsData?.content ?? [];
 
   const createComment = useCreateComment(movieId);
+  const updateComment = useUpdateComment(movieId);
   const deleteComment = useDeleteComment(movieId);
   const createRating = useCreateRating(movieId);
 
@@ -32,9 +34,33 @@ export default function MovieDetailPage() {
     resolver: zodResolver(CreateCommentSchema),
   });
 
+  const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit, setValue: setEditValue } = useForm<UpdateCommentRequest>({
+    resolver: zodResolver(UpdateCommentSchema),
+  });
+
   const onSubmitComment = (data: CreateCommentRequest) => {
     if (createComment.isPending) return;
     createComment.mutate(data, { onSuccess: () => reset() });
+  };
+
+  const startEditing = (commentId: number, currentText: string) => {
+    setEditingCommentId(commentId);
+    setEditValue('text', currentText);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    resetEdit();
+  };
+
+  const onSubmitEdit = (commentId: number, data: UpdateCommentRequest) => {
+    if (updateComment.isPending) return;
+    updateComment.mutate({ commentId, data }, {
+      onSuccess: () => {
+        setEditingCommentId(null);
+        resetEdit();
+      },
+    });
   };
 
   const handleRate = (score: number) => {
@@ -159,18 +185,60 @@ export default function MovieDetailPage() {
                         <span className="text-sm text-muted-foreground ml-2">
                           {new Date(comment.createdAt).toLocaleDateString()}
                         </span>
+                        {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
+                          <span className="text-sm text-muted-foreground ml-2">(edited)</span>
+                        )}
                       </div>
                       {(isAdmin || comment.userId === userId) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteComment.mutate(comment.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                          {comment.userId === userId && editingCommentId !== comment.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => startEditing(comment.id, comment.text)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm('Delete this comment?')) {
+                                deleteComment.mutate(comment.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
-                    <p className="mt-1">{comment.text}</p>
+                    {editingCommentId === comment.id ? (
+                      <form onSubmit={handleSubmitEdit((data) => onSubmitEdit(comment.id, data))} className="mt-2">
+                        <Textarea
+                          {...registerEdit('text')}
+                          className="mb-2"
+                          disabled={updateComment.isPending}
+                        />
+                        <div className="flex gap-2">
+                          <Button type="submit" size="sm" disabled={updateComment.isPending}>
+                            {updateComment.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Check className="h-4 w-4 mr-1" />
+                            )}
+                            Save
+                          </Button>
+                          <Button type="button" size="sm" variant="outline" onClick={cancelEditing} disabled={updateComment.isPending}>
+                            <X className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      <p className="mt-1">{comment.text}</p>
+                    )}
                   </div>
                 ))}
               </div>

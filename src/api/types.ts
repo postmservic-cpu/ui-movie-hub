@@ -72,7 +72,12 @@ export const CreateCommentSchema = z.object({
   text: z.string().min(1, 'Comment cannot be empty'),
 });
 
+export const UpdateCommentSchema = z.object({
+  text: z.string().min(1, 'Comment cannot be empty'),
+});
+
 export type CreateCommentRequest = z.infer<typeof CreateCommentSchema>;
+export type UpdateCommentRequest = z.infer<typeof UpdateCommentSchema>;
 
 export interface CommentResponse {
   id: number;
@@ -81,6 +86,7 @@ export interface CommentResponse {
   username: string;
   text: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface PageCommentResponse {

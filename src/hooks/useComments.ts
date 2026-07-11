@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commentsApi } from '@/api/comments';
-import type { CreateCommentRequest } from '@/api/types';
+import type { CreateCommentRequest, UpdateCommentRequest } from '@/api/types';
 
 export function useAllComments(params?: { username?: string; text?: string; page?: number; size?: number }) {
   return useQuery({
@@ -21,6 +21,15 @@ export function useCreateComment(movieId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateCommentRequest) => commentsApi.create(movieId, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments', movieId] }),
+  });
+}
+
+export function useUpdateComment(movieId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ commentId, data }: { commentId: number; data: UpdateCommentRequest }) =>
+      commentsApi.update(movieId, commentId, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['comments', movieId] }),
   });
 }

@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { PageCommentResponse, CommentResponse, CreateCommentRequest } from './types';
+import type { PageCommentResponse, CommentResponse, CreateCommentRequest, UpdateCommentRequest } from './types';
 
 export const commentsApi = {
   getAll: (params?: { username?: string; text?: string; page?: number; size?: number }) =>
@@ -10,6 +10,9 @@ export const commentsApi = {
 
   create: (movieId: number, data: CreateCommentRequest) =>
     apiClient.post<CommentResponse>(`/v1/movies/${movieId}/comments`, data).then((r) => r.data),
+
+  update: (movieId: number, commentId: number, data: UpdateCommentRequest) =>
+    apiClient.put<CommentResponse>(`/v1/movies/${movieId}/comments/${commentId}`, data).then((r) => r.data),
 
   delete: (movieId: number, commentId: number) =>
     apiClient.delete(`/v1/movies/${movieId}/comments/${commentId}`),
