@@ -15,7 +15,7 @@ export function useCreateRating(movieId: number) {
   return useMutation({
     mutationFn: (data: CreateRatingRequest) => ratingsApi.create(movieId, data),
     onSuccess: (response, variables) => {
-      // Optimistically recalculate the average rating in the cache
+      // Optimistically recalculate the average rating in the movie cache
       const movieData = queryClient.getQueryData<MovieResponse>(['movie', movieId]);
       const ratingsData = queryClient.getQueryData<PageRatingResponse>(['ratings', movieId]);
 
@@ -43,8 +43,9 @@ export function useCreateRating(movieId: number) {
         }
       }
 
+      // Invalidate ratings list and home page, but NOT ['movie', movieId]
+      // to avoid the backend's stale average overwriting our optimistic update
       queryClient.invalidateQueries({ queryKey: ['ratings', movieId] });
-      queryClient.invalidateQueries({ queryKey: ['movie', movieId] });
       queryClient.invalidateQueries({ queryKey: ['movies'] });
     },
   });
