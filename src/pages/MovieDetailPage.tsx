@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMovie } from '@/hooks/useMovies';
 import { useComments, useCreateComment, useUpdateComment, useDeleteComment } from '@/hooks/useComments';
-import { useCreateRating } from '@/hooks/useRatings';
+import { useCreateRating, useRatings } from '@/hooks/useRatings';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,21 @@ export default function MovieDetailPage() {
   const { data: movie, isLoading: movieLoading } = useMovie(movieId);
   const { data: commentsData } = useComments(movieId);
   const comments = commentsData?.content ?? [];
+  const { data: ratingsData } = useRatings(movieId);
 
   const createComment = useCreateComment(movieId);
   const updateComment = useUpdateComment(movieId);
   const deleteComment = useDeleteComment(movieId);
   const createRating = useCreateRating(movieId);
+
+  useEffect(() => {
+    if (ratingsData?.content && userId) {
+      const myRating = ratingsData.content.find((r) => r.userId === userId);
+      if (myRating) {
+        setSelectedRating(myRating.score);
+      }
+    }
+  }, [ratingsData, userId]);
 
   const { register, handleSubmit, reset } = useForm<CreateCommentRequest>({
     resolver: zodResolver(CreateCommentSchema),
@@ -145,7 +155,7 @@ export default function MovieDetailPage() {
               </div>
               {movie.averageRating && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Average: {movie.averageRating.toFixed(1)}/5 ({movie.ratingsCount} votes)
+                  Average: {movie.averageRating.toFixed(1)}/10 ({movie.ratingsCount} votes)
                 </p>
               )}
             </CardContent>
