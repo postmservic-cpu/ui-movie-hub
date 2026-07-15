@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { ArrowLeft, Check } from 'lucide-react';
+import { toast } from 'sonner';
 import { useState } from 'react';
 
 export default function AdminMovieFormPage() {
@@ -45,7 +47,7 @@ export default function AdminMovieFormPage() {
     if (isEdit) {
       updateMovie.mutate(
         { id: Number(id), data },
-        { onSuccess: () => navigate('/admin') }
+        { onSuccess: () => toast.success('Movie updated successfully') }
       );
     } else {
       createMovie.mutate(data, { onSuccess: () => navigate('/admin') });
@@ -54,9 +56,19 @@ export default function AdminMovieFormPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">
-        {isEdit ? 'Edit Movie' : 'Add Movie'}
-      </h1>
+      <div className="flex items-center gap-3 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('/admin/movies')}
+          className="h-10 w-10"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-3xl font-bold">
+          {isEdit ? 'Edit Movie' : 'Add Movie'}
+        </h1>
+      </div>
       <Card>
         <CardContent className="pt-6">
           {!isDataReady ? (
