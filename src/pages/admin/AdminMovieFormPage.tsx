@@ -17,9 +17,10 @@ export default function AdminMovieFormPage() {
   const isEdit = !!id;
   const navigate = useNavigate();
 
-  const { data: movie } = useMovie(Number(id));
-  const { data: categoriesData } = useCategories();
+  const { data: movie, isLoading: movieLoading } = useMovie(Number(id));
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
   const categories = categoriesData?.content ?? [];
+  const isDataReady = isEdit ? !movieLoading && !categoriesLoading : !categoriesLoading;
   const createMovie = useCreateMovie();
   const updateMovie = useUpdateMovie();
 
@@ -57,6 +58,11 @@ export default function AdminMovieFormPage() {
       </h1>
       <Card>
         <CardContent className="pt-6">
+          {!isDataReady ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Loading...</div>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label>Title *</Label>
@@ -102,6 +108,7 @@ export default function AdminMovieFormPage() {
               </Button>
             </div>
           </form>
+          )}
         </CardContent>
       </Card>
     </div>
