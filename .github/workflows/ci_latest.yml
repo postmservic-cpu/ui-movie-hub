@@ -1,0 +1,15 @@
+name: CI on push (latest) to PaaS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Trigger Render deploy
+        run: curl -X POST ${{ secrets.RENDER_UI_DEPLOY_HOOK }}

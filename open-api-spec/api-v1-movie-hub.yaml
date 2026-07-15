@@ -2,7 +2,7 @@ openapi: 3.1.0
 
 info:
   title: Movie Hub API
-  version: 1.2.0
+  version: 1.3.0
   description: REST API for managing movies, comments, and ratings.
 
 servers:
@@ -20,6 +20,8 @@ tags:
     description: Movie rating operations
   - name: Categories
     description: Category management operations
+  - name: Users
+    description: User management operations
 
 security:
   - bearerAuth: []
@@ -569,6 +571,49 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /v1/users:
+    get:
+      tags: [Users]
+      summary: Get all users
+      description: Admin-only. Returns a paginated list of users, with optional username and email filters.
+      operationId: getUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: query
+          description: Filter by username (contains, case-insensitive)
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Filter by email (contains, case-insensitive)
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Page of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
 
   securitySchemes:
@@ -913,6 +958,37 @@ components:
           format: int64
         name:
           type: string
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        keycloakId:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+
+    PageUserResponse:
+      type: object
+      description: Page envelope for UserResponse results, matching Spring Data Page<UserResponse>.
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
 
     ProblemDetail:
       type: object

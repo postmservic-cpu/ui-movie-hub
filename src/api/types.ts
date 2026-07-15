@@ -129,3 +129,19 @@ export interface PageInteger {
   size: number;
   number: number;
 }
+
+// === User ===
+export interface UserResponse {
+  id: number;
+  keycloakId: string;
+  username: string;
+  email: string;
+}
+
+export interface PageUserResponse {
+  content: UserResponse[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
