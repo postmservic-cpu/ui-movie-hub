@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 export default function AdminMovieFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,21 +24,22 @@ export default function AdminMovieFormPage() {
   const createMovie = useCreateMovie();
   const updateMovie = useUpdateMovie();
 
-  const { register, handleSubmit, setValue, watch, reset } = useForm<CreateMovieRequest>({
+  const [imgError, setImgError] = useState(false);
+
+  const { register, handleSubmit, setValue, watch } = useForm<CreateMovieRequest>({
     resolver: zodResolver(isEdit ? UpdateMovieSchema : CreateMovieSchema),
+    values: isDataReady && movie
+      ? {
+          title: movie.title,
+          imageUrl: movie.imageUrl,
+          description: movie.description ?? '',
+          releaseYear: movie.releaseYear,
+          categoryId: movie.categoryId,
+        }
+      : undefined,
   });
 
-  useEffect(() => {
-    if (movie) {
-      reset({
-        title: movie.title,
-        imageUrl: movie.imageUrl,
-        description: movie.description ?? '',
-        releaseYear: movie.releaseYear,
-        categoryId: movie.categoryId,
-      });
-    }
-  }, [movie, reset]);
+  const imageUrl = watch('imageUrl');
 
   const onSubmit = (data: CreateMovieRequest) => {
     if (isEdit) {
@@ -71,6 +72,23 @@ export default function AdminMovieFormPage() {
             <div>
               <Label>Image URL *</Label>
               <Input {...register('imageUrl')} placeholder="https://..." />
+              {imageUrl && (
+                <div className="mt-2 relative w-full max-w-sm overflow-hidden rounded-lg border">
+                  {imgError ? (
+                    <div className="flex items-center justify-center h-40 bg-muted text-muted-foreground text-sm">
+                      Failed to load image
+                    </div>
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      alt="Preview"
+                      className="w-full h-auto max-h-60 object-contain"
+                      onError={() => setImgError(true)}
+                      onLoad={() => setImgError(false)}
+                    />
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <Label>Description</Label>
@@ -84,6 +102,7 @@ export default function AdminMovieFormPage() {
               <div>
                 <Label>Category *</Label>
                 <Select
+                  key={watch('categoryId')?.toString() || '_'}
                   value={watch('categoryId')?.toString()}
                   onValueChange={(v) => setValue('categoryId', Number(v))}
                   items={categories.map((cat) => ({ value: String(cat.id), label: cat.name }))}
